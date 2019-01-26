@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:meetup_animations/main.dart';
 
@@ -64,9 +63,15 @@ class MyHeader extends StatelessWidget {
                 children: <Widget>[
                   Icon(Icons.search, color: Colors.grey),
                   SizedBox(width: 8),
-                  Text('Search', style: TextStyle(color: Colors.grey),),
+                  Text(
+                    'Search',
+                    style: TextStyle(color: Colors.grey),
+                  ),
                   Spacer(),
-                  Icon(Icons.tune, color: lightBlue,)
+                  Icon(
+                    Icons.tune,
+                    color: lightBlue,
+                  )
                 ],
               ),
             )

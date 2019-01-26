@@ -33,4 +33,4 @@ flutter:
   # the material Icons class.
   uses-material-design: true
   assets:
-    - assets/biceps.png
+    - assets/

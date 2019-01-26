@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:meetup_animations/entrance_fader.dart';
-import 'package:meetup_animations/list_page.dart';
+import 'package:meetup_animations/exercise.dart';
 import 'package:meetup_animations/main.dart';
 
 class DetailsPage extends StatefulWidget {
@@ -20,7 +19,7 @@ class DetailsPageState extends State<DetailsPage>
   final PageController pageController = PageController();
   AnimationController _animationController;
   Animation<EdgeInsets> _paddingAnimation;
-AnimatedOpacity x;
+
   @override
   void initState() {
     super.initState();
@@ -42,9 +41,12 @@ AnimatedOpacity x;
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
 
-    return Scaffold(
-      body: EntranceFader(
-        child: SingleChildScrollView(
+    return SlideTransition(
+      position: Tween<Offset>(begin: Offset(0, 0.2), end: Offset.zero).animate(
+          CurvedAnimation(
+              parent: _animationController, curve: Interval(0, 0.7))),
+      child: Scaffold(
+        body: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -78,8 +80,13 @@ AnimatedOpacity x;
                   controller: pageController,
                   children: <Widget>[
                     Hero(
-                        tag: widget.exercise.name,
-                        child: Image.asset('assets/biceps.png')),
+                      tag: widget.exercise.name,
+                      child: Image.asset(
+                        'assets/${widget.exercise.imageName}',
+                        height: 300,
+                        fit: BoxFit.fitHeight,
+                      ),
+                    ),
                     Image.asset('assets/biceps.png'),
                     Image.asset('assets/biceps.png'),
                   ],
@@ -90,7 +97,8 @@ AnimatedOpacity x;
                 height: 28,
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: Text(
                   'MUSCLES INVOLVED',
                   style: TextStyle(
@@ -106,7 +114,8 @@ AnimatedOpacity x;
                   scrollDirection: Axis.horizontal,
                   children: widget.exercise.tags.map(
                     (tag) {
-                      double opacity = widget.exercise.tags.first == tag ? 1 : .5;
+                      double opacity =
+                          widget.exercise.tags.first == tag ? 1 : .5;
                       return Center(
                         child: AnimatedBuilder(
                           animation: _animationController,
@@ -139,7 +148,8 @@ AnimatedOpacity x;
                 height: 28,
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: Text(
                   'ABOUT',
                   style: TextStyle(

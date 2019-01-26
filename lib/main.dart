@@ -21,16 +21,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
-class MyAnimatedWidget extends AnimatedWidget {
-  MyAnimatedWidget({Animation animation}) : super(listenable: animation);
-
-  @override
-  Widget build(BuildContext context) {
-    Animation animation = super.listenable;
-    return Opacity(
-      opacity: animation.value,
-      child: FlutterLogo(),
-    );
-  }
-}

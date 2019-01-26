@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:meetup_animations/details_page.dart';
+import 'package:meetup_animations/exercise.dart';
+import 'package:meetup_animations/exercise_list_item.dart';
 import 'package:meetup_animations/fade_route.dart';
-import 'package:meetup_animations/main.dart';
 import 'package:meetup_animations/myheader.dart';
 import 'package:rect_getter/rect_getter.dart';
 
@@ -45,7 +46,9 @@ class ListPageState extends State<ListPage>
               Expanded(
                 child: BodyWidget(
                   goToNextPage: (ex) => _goToDetails(ex),
-                  emptySpace: MediaQuery.of(context).size.width*0.2*_navigationController.value,
+                  emptySpace: MediaQuery.of(context).size.width *
+                      0.2 *
+                      _navigationController.value,
                 ),
               )
             ],
@@ -57,7 +60,6 @@ class ListPageState extends State<ListPage>
 
   void _goToDetails(Exercise exercise) async {
     _navigationController.forward();
-//    await Future.delayed(Duration(milliseconds: 150));
     await Navigator.of(context)
         .push(FadeRoute(DetailsPage(exercise: exercise)));
     _navigationController.reverse();
@@ -69,7 +71,8 @@ class BodyWidget extends StatefulWidget {
   final Function(Exercise) goToNextPage;
   final double emptySpace;
 
-  const BodyWidget({Key key, this.goToNextPage, this.emptySpace}) : super(key: key);
+  const BodyWidget({Key key, this.goToNextPage, this.emptySpace = 0})
+      : super(key: key);
 
   @override
   _BodyWidgetState createState() => _BodyWidgetState();
@@ -82,17 +85,20 @@ class _BodyWidgetState extends State<BodyWidget> with TickerProviderStateMixin {
   OverlayEntry transitionOverlayEntry;
 
   List<Exercise> exercises = [
-    Exercise('Pullups', ['Lats', 'Biceps']),
-    Exercise('Leg Press', ['Quadriceps', 'Hamstrings']),
-    Exercise('Dumbbell Bench Press', ['Chest', 'Triceps']),
-    Exercise('Deadlift', ['Hamstrings', 'Lower Back', 'Quadriceps', 'Glutes']),
-    Exercise('Bent Over Barbell Row', ['Lats', 'Middle Back', 'Deltoids']),
-    Exercise('T-Bar Row', ['Middle Back', 'Lats']),
-    Exercise('Pushups', ['Chest', 'Triceps']),
-    Exercise('Bent Over Two-Arm Long Bar Row', ['Middle Back', 'Lats']),
-    Exercise('Dumbbel Bench Press', ['Chest', 'Triceps']),
-    Exercise('Wide-Grip Barbell Curl', ['Chest', 'Deltoids']),
-    Exercise('Decline Dumbbel Flyes', ['Chest', 'Deltoids']),
+    Exercise('Pullups', ['Lats', 'Biceps'], 'i1.png'),
+    Exercise('Leg Press', ['Quadriceps', 'Hamstrings'], 'i2.png'),
+    Exercise('Dumbbell Bench Press', ['Chest', 'Triceps'], 'i3.png'),
+    Exercise('Deadlift', ['Hamstrings', 'Lower Back', 'Quadriceps', 'Glutes'],
+        'i4.png'),
+    Exercise(
+        'Bent Over Barbell Row', ['Lats', 'Middle Back', 'Deltoids'], 'i5.png'),
+    Exercise('T-Bar Row', ['Middle Back', 'Lats'], 'i6.png'),
+    Exercise('Pushups', ['Chest', 'Triceps'], 'i7.png'),
+    Exercise(
+        'Bent Over Two-Arm Long Bar Row', ['Middle Back', 'Lats'], 'i8.png'),
+    Exercise('Dumbbel Bench Press', ['Chest', 'Triceps'], 'i9.png'),
+    Exercise('Wide-Grip Barbell Curl', ['Chest', 'Deltoids'], 'i10.png'),
+    Exercise('Decline Dumbbel Flyes', ['Chest', 'Deltoids'], 'i11.png'),
   ];
   List<Exercise> selectedExercises = [];
 
@@ -125,8 +131,9 @@ class _BodyWidgetState extends State<BodyWidget> with TickerProviderStateMixin {
         ),
         SizedBox(width: widget.emptySpace),
         SizedBox(
-            width: MediaQuery.of(context).size.width * 0.8,
-            child: _buildSelectedSegment()),
+          width: MediaQuery.of(context).size.width * 0.8,
+          child: _buildSelectedSegment(),
+        ),
       ],
     );
   }
@@ -135,7 +142,6 @@ class _BodyWidgetState extends State<BodyWidget> with TickerProviderStateMixin {
     int indexOfExercise = exercises.indexOf(exercise);
     setState(() {
       exercises[indexOfExercise] = null;
-      exercises.remove(exercise);
     });
 
     Rect lastContainerRect = RectGetter.getRectFromKey(lastItemKey);
@@ -146,7 +152,9 @@ class _BodyWidgetState extends State<BodyWidget> with TickerProviderStateMixin {
       begin: rect,
       end: endRect,
     ).animate(CurvedAnimation(
-        parent: _transitionController, curve: Curves.easeInOut));
+      parent: _transitionController,
+      curve: Curves.easeInOut,
+    ));
 
     transitionOverlayEntry = _createOverlayEntry(exercise);
     Overlay.of(context).insert(transitionOverlayEntry);
@@ -191,7 +199,10 @@ class _BodyWidgetState extends State<BodyWidget> with TickerProviderStateMixin {
             padding: EdgeInsets.all(0),
             itemBuilder: (context, index) {
               if (index == selectedExercises.length) {
-                return RectGetter(key: lastItemKey, child: Container());
+                return RectGetter(
+                  key: lastItemKey,
+                  child: Container(),
+                );
               }
               return ExerciseListItem(
                 exercise: selectedExercises[index],
@@ -232,7 +243,9 @@ class _BodyWidgetState extends State<BodyWidget> with TickerProviderStateMixin {
                 child: ExerciseListItem(
                   exercise: exercise,
                   onPlusTap: () => _onItemTap(
-                      exercise, RectGetter.getRectFromKey(globalKey)),
+                        exercise,
+                        RectGetter.getRectFromKey(globalKey),
+                      ),
                   onTap: () => widget.goToNextPage(exercise),
                 ),
               );
@@ -260,88 +273,4 @@ class _BodyWidgetState extends State<BodyWidget> with TickerProviderStateMixin {
       indent: 16,
     );
   }
-}
-
-class ExerciseListItem extends StatelessWidget {
-  final Exercise exercise;
-  final VoidCallback onTap;
-  final VoidCallback onPlusTap;
-
-  const ExerciseListItem({
-    Key key,
-    @required this.exercise,
-    this.onTap,
-    this.onPlusTap,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      child: InkWell(
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            children: <Widget>[
-              Hero(
-                tag: exercise.name,
-                child: Image.asset(
-                  'assets/biceps.png',
-                  width: 40,
-                  height: 40,
-                ),
-              ),
-              SizedBox(width: 24),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text(
-                      exercise.name,
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 4),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 4,
-                      children: exercise.tags.map((tag) {
-                        return Container(
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(4),
-                            child: Text(
-                              tag,
-                              style:
-                                  TextStyle(color: Colors.grey, fontSize: 12),
-                            ),
-                          ),
-                        );
-                      }).toList(),
-                    )
-                  ],
-                ),
-              ),
-              GestureDetector(
-                onTap: onPlusTap,
-                child: Icon(
-                  Icons.add_circle_outline,
-                  color: lightBlue,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class Exercise {
-  final String name;
-  final List<String> tags;
-
-  Exercise(this.name, this.tags);
 }
