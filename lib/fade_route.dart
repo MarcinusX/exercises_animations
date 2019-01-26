@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:meetup_animations/details_page.dart';
 
 class FadeRoute<T> extends PageRouteBuilder<T> {
   FadeRoute(Widget child)
@@ -11,6 +10,6 @@ class FadeRoute<T> extends PageRouteBuilder<T> {
               child: child,
             );
           },
-          transitionDuration: Duration(milliseconds: 300),
+          transitionDuration: Duration(milliseconds: 500),
         );
 }

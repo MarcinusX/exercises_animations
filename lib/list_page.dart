@@ -1,34 +1,82 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:meetup_animations/details_page.dart';
 import 'package:meetup_animations/fade_route.dart';
 import 'package:meetup_animations/main.dart';
 import 'package:meetup_animations/myheader.dart';
 import 'package:rect_getter/rect_getter.dart';
 
-class ListPage extends StatelessWidget {
+class ListPage extends StatefulWidget {
+  @override
+  ListPageState createState() {
+    return new ListPageState();
+  }
+}
+
+class ListPageState extends State<ListPage>
+    with SingleTickerProviderStateMixin {
+  AnimationController _navigationController;
+
+  @override
+  void initState() {
+    super.initState();
+    _navigationController =
+        AnimationController(vsync: this, duration: Duration(milliseconds: 300));
+  }
+
+  @override
+  void dispose() {
+    _navigationController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        children: <Widget>[
-          MyHeader(),
-          Expanded(
-            child: BodyWidget(),
-          )
-        ],
+      body: AnimatedBuilder(
+        animation: _navigationController,
+        builder: (context, child) {
+          return Column(
+            children: <Widget>[
+              Transform.translate(
+                offset: Offset(0, -200 * _navigationController.value),
+                child: MyHeader(),
+              ),
+              Expanded(
+                child: BodyWidget(
+                  goToNextPage: (ex) => _goToDetails(ex),
+                  emptySpace: MediaQuery.of(context).size.width*0.2*_navigationController.value,
+                ),
+              )
+            ],
+          );
+        },
       ),
     );
+  }
+
+  void _goToDetails(Exercise exercise) async {
+    _navigationController.forward();
+//    await Future.delayed(Duration(milliseconds: 150));
+    await Navigator.of(context)
+        .push(FadeRoute(DetailsPage(exercise: exercise)));
+    _navigationController.reverse();
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
   }
 }
 
 class BodyWidget extends StatefulWidget {
+  final Function(Exercise) goToNextPage;
+  final double emptySpace;
+
+  const BodyWidget({Key key, this.goToNextPage, this.emptySpace}) : super(key: key);
+
   @override
   _BodyWidgetState createState() => _BodyWidgetState();
 }
 
-class _BodyWidgetState extends State<BodyWidget>
-    with SingleTickerProviderStateMixin {
-  AnimationController _animationController;
+class _BodyWidgetState extends State<BodyWidget> with TickerProviderStateMixin {
+  AnimationController _transitionController;
   Animation<Rect> _rectAnimation;
   final GlobalKey lastItemKey = RectGetter.createGlobalKey();
   OverlayEntry transitionOverlayEntry;
@@ -51,9 +99,9 @@ class _BodyWidgetState extends State<BodyWidget>
   @override
   void initState() {
     super.initState();
-    _animationController =
+    _transitionController =
         AnimationController(vsync: this, duration: Duration(milliseconds: 500));
-    _animationController.addStatusListener((status) {
+    _transitionController.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
         transitionOverlayEntry?.remove();
       }
@@ -62,7 +110,7 @@ class _BodyWidgetState extends State<BodyWidget>
 
   @override
   void dispose() {
-    _animationController.dispose();
+    _transitionController.dispose();
     super.dispose();
   }
 
@@ -75,6 +123,7 @@ class _BodyWidgetState extends State<BodyWidget>
           width: MediaQuery.of(context).size.width * 0.8,
           child: _buildLibrarySegment(),
         ),
+        SizedBox(width: widget.emptySpace),
         SizedBox(
             width: MediaQuery.of(context).size.width * 0.8,
             child: _buildSelectedSegment()),
@@ -96,13 +145,13 @@ class _BodyWidgetState extends State<BodyWidget>
     _rectAnimation = RectTween(
       begin: rect,
       end: endRect,
-    ).animate(
-        CurvedAnimation(parent: _animationController, curve: Curves.easeInOut));
+    ).animate(CurvedAnimation(
+        parent: _transitionController, curve: Curves.easeInOut));
 
     transitionOverlayEntry = _createOverlayEntry(exercise);
     Overlay.of(context).insert(transitionOverlayEntry);
 
-    _animationController.forward(from: 0).then((_) {
+    _transitionController.forward(from: 0).then((_) {
       setState(() {
         selectedExercises.add(exercise);
         exercises.removeAt(indexOfExercise);
@@ -168,10 +217,10 @@ class _BodyWidgetState extends State<BodyWidget>
               Exercise exercise = exercises[index];
               if (exercise == null) {
                 return AnimatedBuilder(
-                  animation: _animationController,
+                  animation: _transitionController,
                   builder: (context, child) {
                     return SizedBox(
-                      height: (1 - _animationController.value) *
+                      height: (1 - _transitionController.value) *
                           _rectAnimation.value.height,
                     );
                   },
@@ -184,7 +233,7 @@ class _BodyWidgetState extends State<BodyWidget>
                   exercise: exercise,
                   onPlusTap: () => _onItemTap(
                       exercise, RectGetter.getRectFromKey(globalKey)),
-                  onTap: () => _goToDetails(exercise),
+                  onTap: () => widget.goToNextPage(exercise),
                 ),
               );
             },
@@ -193,10 +242,6 @@ class _BodyWidgetState extends State<BodyWidget>
         )
       ],
     );
-  }
-
-  void _goToDetails(Exercise exercise) {
-    Navigator.of(context).push(FadeRoute(DetailsPage(exercise: exercise)));
   }
 
   Widget _listTitle(String title) {
@@ -238,10 +283,13 @@ class ExerciseListItem extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           child: Row(
             children: <Widget>[
-              Image.asset(
-                'assets/biceps.png',
-                width: 40,
-                height: 40,
+              Hero(
+                tag: exercise.name,
+                child: Image.asset(
+                  'assets/biceps.png',
+                  width: 40,
+                  height: 40,
+                ),
               ),
               SizedBox(width: 24),
               Expanded(
