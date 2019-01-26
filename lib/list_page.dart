@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:meetup_animations/details_page.dart';
+import 'package:meetup_animations/fade_route.dart';
 import 'package:meetup_animations/main.dart';
 import 'package:meetup_animations/myheader.dart';
 import 'package:rect_getter/rect_getter.dart';
@@ -144,7 +146,6 @@ class _BodyWidgetState extends State<BodyWidget>
               }
               return ExerciseListItem(
                 exercise: selectedExercises[index],
-                onTap: (e) {},
               );
             },
             itemCount: selectedExercises.length + 1,
@@ -181,8 +182,9 @@ class _BodyWidgetState extends State<BodyWidget>
                 key: globalKey,
                 child: ExerciseListItem(
                   exercise: exercise,
-                  onTap: (e) =>
-                      _onItemTap(e, RectGetter.getRectFromKey(globalKey)),
+                  onPlusTap: () => _onItemTap(
+                      exercise, RectGetter.getRectFromKey(globalKey)),
+                  onTap: () => _goToDetails(exercise),
                 ),
               );
             },
@@ -191,6 +193,10 @@ class _BodyWidgetState extends State<BodyWidget>
         )
       ],
     );
+  }
+
+  void _goToDetails(Exercise exercise) {
+    Navigator.of(context).push(FadeRoute(DetailsPage(exercise: exercise)));
   }
 
   Widget _listTitle(String title) {
@@ -213,19 +219,21 @@ class _BodyWidgetState extends State<BodyWidget>
 
 class ExerciseListItem extends StatelessWidget {
   final Exercise exercise;
-  final Function(Exercise) onTap;
+  final VoidCallback onTap;
+  final VoidCallback onPlusTap;
 
   const ExerciseListItem({
     Key key,
     @required this.exercise,
     this.onTap,
+    this.onPlusTap,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Material(
       child: InkWell(
-        onTap: () => onTap(exercise),
+        onTap: onTap,
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Row(
@@ -268,10 +276,13 @@ class ExerciseListItem extends StatelessWidget {
                   ],
                 ),
               ),
-              Icon(
-                Icons.add_circle_outline,
-                color: lightBlue,
-              )
+              GestureDetector(
+                onTap: onPlusTap,
+                child: Icon(
+                  Icons.add_circle_outline,
+                  color: lightBlue,
+                ),
+              ),
             ],
           ),
         ),
