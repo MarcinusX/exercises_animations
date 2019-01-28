@@ -145,8 +145,12 @@ class _BodyWidgetState extends State<BodyWidget> with TickerProviderStateMixin {
     });
 
     Rect lastContainerRect = RectGetter.getRectFromKey(lastItemKey);
-    Rect endRect = Rect.fromLTWH(lastContainerRect.left, lastContainerRect.top,
-        rect.size.width, rect.size.height);
+    Rect endRect = Rect.fromLTWH(
+      lastContainerRect?.left ?? MediaQuery.of(context).size.width * 0.8,
+      lastContainerRect?.top ?? MediaQuery.of(context).size.height,
+      rect.size.width,
+      rect.size.height,
+    );
 
     _rectAnimation = RectTween(
       begin: rect,
