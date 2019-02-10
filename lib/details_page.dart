@@ -41,130 +41,123 @@ class DetailsPageState extends State<DetailsPage>
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
 
-    return SlideTransition(
-      position: Tween<Offset>(begin: Offset(0, 0.2), end: Offset.zero).animate(
-          CurvedAnimation(
-              parent: _animationController, curve: Interval(0, 0.7))),
-      child: Scaffold(
-        body: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              SizedBox(
-                height: MediaQuery.of(context).padding.top,
+    return Scaffold(
+      body: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            SizedBox(
+              height: MediaQuery.of(context).padding.top,
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  GestureDetector(
+                    child: Icon(Icons.arrow_back, color: lightBlue),
+                    onTap: () => Navigator.of(context).pop(),
+                  ),
+                  Icon(Icons.add_circle_outline, color: lightBlue),
+                ],
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    GestureDetector(
-                      child: Icon(Icons.arrow_back, color: lightBlue),
-                      onTap: () => Navigator.of(context).pop(),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Text(
+                widget.exercise.name,
+                style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+              ),
+            ),
+            SizedBox(
+              height: 300,
+              child: PageView(
+                controller: pageController,
+                children: <Widget>[
+                  Hero(
+                    tag: widget.exercise.name,
+                    child: Image.asset(
+                      'assets/${widget.exercise.imageName}',
+                      height: 300,
+                      fit: BoxFit.fitHeight,
                     ),
-                    Icon(Icons.add_circle_outline, color: lightBlue),
-                  ],
+                  ),
+                  Image.asset('assets/biceps.png'),
+                  Image.asset('assets/biceps.png'),
+                ],
+              ),
+            ),
+            Divider(
+              color: Colors.grey,
+              height: 28,
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Text(
+                'MUSCLES INVOLVED',
+                style: TextStyle(
+                  color: Colors.grey,
+                  fontWeight: FontWeight.w500,
+                  fontSize: 12,
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: Text(
-                  widget.exercise.name,
-                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-                ),
-              ),
-              SizedBox(
-                height: 300,
-                child: PageView(
-                  controller: pageController,
-                  children: <Widget>[
-                    Hero(
-                      tag: widget.exercise.name,
-                      child: Image.asset(
-                        'assets/${widget.exercise.imageName}',
-                        height: 300,
-                        fit: BoxFit.fitHeight,
-                      ),
-                    ),
-                    Image.asset('assets/biceps.png'),
-                    Image.asset('assets/biceps.png'),
-                  ],
-                ),
-              ),
-              Divider(
-                color: Colors.grey,
-                height: 28,
-              ),
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                child: Text(
-                  'MUSCLES INVOLVED',
-                  style: TextStyle(
-                      color: Colors.grey,
-                      fontWeight: FontWeight.w500,
-                      fontSize: 12),
-                ),
-              ),
-              SizedBox(
-                height: 32,
-                child: ListView(
-                  padding: EdgeInsets.only(left: 16),
-                  scrollDirection: Axis.horizontal,
-                  children: widget.exercise.tags.map(
-                    (tag) {
-                      double opacity =
-                          widget.exercise.tags.first == tag ? 1 : .5;
-                      return Center(
-                        child: AnimatedBuilder(
-                          animation: _animationController,
-                          builder: (context, child) {
-                            return Padding(
-                              padding: _paddingAnimation.value,
-                              child: child,
-                            );
-                          },
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: lightBlue.withOpacity(opacity),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                tag,
-                                style: TextStyle(color: Colors.white),
-                              ),
+            ),
+            SizedBox(
+              height: 32,
+              child: ListView(
+                padding: EdgeInsets.only(left: 16),
+                scrollDirection: Axis.horizontal,
+                children: widget.exercise.tags.map(
+                  (tag) {
+                    double opacity = widget.exercise.tags.first == tag ? 1 : .5;
+                    return Center(
+                      child: AnimatedBuilder(
+                        animation: _animationController,
+                        builder: (context, child) {
+                          return Padding(
+                            padding: _paddingAnimation.value,
+                            child: child,
+                          );
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: lightBlue.withOpacity(opacity),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              tag,
+                              style: TextStyle(color: Colors.white),
                             ),
                           ),
                         ),
-                      );
-                    },
-                  ).toList(),
-                ),
+                      ),
+                    );
+                  },
+                ).toList(),
               ),
-              Divider(
-                color: Colors.grey,
-                height: 28,
+            ),
+            Divider(
+              color: Colors.grey,
+              height: 28,
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Text(
+                'ABOUT',
+                style: TextStyle(
+                    color: Colors.grey,
+                    fontWeight: FontWeight.w500,
+                    fontSize: 12),
               ),
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                child: Text(
-                  'ABOUT',
-                  style: TextStyle(
-                      color: Colors.grey,
-                      fontWeight: FontWeight.w500,
-                      fontSize: 12),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Text(
-                    'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas quis elit mauris. Sed dictum accumsan ligula non scelerisque. Nam nibh nulla, tincidunt ut diam quis, porttitor ultrices felis. Duis turpis libero, aliquet eget fermentum id, sollicitudin vitae tellus. Aliquam felis lorem, pretium vel fringilla sed, placerat eu purus. Maecenas in porttitor eros. Suspendisse pulvinar, nulla id cursus gravida, nibh lectus ornare lorem, ac pulvinar sapien massa euismod velit. Praesent rhoncus ac orci mollis vehicula. Praesent hendrerit massa sed eros porttitor malesuada.'),
-              )
-            ],
-          ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Text(
+                  'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas quis elit mauris. Sed dictum accumsan ligula non scelerisque. Nam nibh nulla, tincidunt ut diam quis, porttitor ultrices felis. Duis turpis libero, aliquet eget fermentum id, sollicitudin vitae tellus. Aliquam felis lorem, pretium vel fringilla sed, placerat eu purus. Maecenas in porttitor eros. Suspendisse pulvinar, nulla id cursus gravida, nibh lectus ornare lorem, ac pulvinar sapien massa euismod velit. Praesent rhoncus ac orci mollis vehicula. Praesent hendrerit massa sed eros porttitor malesuada.'),
+            )
+          ],
         ),
       ),
     );

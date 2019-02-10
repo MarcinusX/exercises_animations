@@ -5,11 +5,17 @@ class FadeRoute<T> extends PageRouteBuilder<T> {
       : super(
           pageBuilder: (context, animation1, animation2) => child,
           transitionsBuilder: (context, animation1, animation2, child) {
-            return FadeTransition(
-              opacity: animation1,
-              child: child,
+            return SlideTransition(
+              position: Tween<Offset>(
+                begin: Offset(0, 0.1),
+                end: Offset.zero,
+              ).animate(animation1),
+              child: FadeTransition(
+                opacity: animation1,
+                child: child,
+              ),
             );
           },
-          transitionDuration: Duration(milliseconds: 500),
+          transitionDuration: Duration(milliseconds: 300),
         );
 }

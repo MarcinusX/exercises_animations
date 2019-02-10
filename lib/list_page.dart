@@ -21,8 +21,10 @@ class ListPageState extends State<ListPage>
   @override
   void initState() {
     super.initState();
-    _navigationController =
-        AnimationController(vsync: this, duration: Duration(milliseconds: 300));
+    _navigationController = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 300),
+    );
   }
 
   @override
@@ -39,8 +41,11 @@ class ListPageState extends State<ListPage>
         builder: (context, child) {
           return Column(
             children: <Widget>[
-              Transform.translate(
-                offset: Offset(0, -200 * _navigationController.value),
+              SlideTransition(
+                position: Tween<Offset>(
+                  begin: Offset.zero,
+                  end: Offset(0, -1),
+                ).animate(_navigationController),
                 child: MyHeader(),
               ),
               Expanded(
@@ -82,7 +87,6 @@ class _BodyWidgetState extends State<BodyWidget> with TickerProviderStateMixin {
   AnimationController _transitionController;
   Animation<Rect> _rectAnimation;
   final GlobalKey lastItemKey = RectGetter.createGlobalKey();
-  OverlayEntry transitionOverlayEntry;
 
   List<Exercise> exercises = [
     Exercise('Pullups', ['Lats', 'Biceps'], 'i1.png'),
@@ -105,13 +109,10 @@ class _BodyWidgetState extends State<BodyWidget> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    _transitionController =
-        AnimationController(vsync: this, duration: Duration(milliseconds: 500));
-    _transitionController.addStatusListener((status) {
-      if (status == AnimationStatus.completed) {
-        transitionOverlayEntry?.remove();
-      }
-    });
+    _transitionController = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 500),
+    );
   }
 
   @override
@@ -160,10 +161,11 @@ class _BodyWidgetState extends State<BodyWidget> with TickerProviderStateMixin {
       curve: Curves.easeInOut,
     ));
 
-    transitionOverlayEntry = _createOverlayEntry(exercise);
+    OverlayEntry transitionOverlayEntry = _createOverlayEntry(exercise);
     Overlay.of(context).insert(transitionOverlayEntry);
 
     _transitionController.forward(from: 0).then((_) {
+      transitionOverlayEntry.remove();
       setState(() {
         selectedExercises.add(exercise);
         exercises.removeAt(indexOfExercise);
@@ -231,15 +233,7 @@ class _BodyWidgetState extends State<BodyWidget> with TickerProviderStateMixin {
             itemBuilder: (context, index) {
               Exercise exercise = exercises[index];
               if (exercise == null) {
-                return AnimatedBuilder(
-                  animation: _transitionController,
-                  builder: (context, child) {
-                    return SizedBox(
-                      height: (1 - _transitionController.value) *
-                          _rectAnimation.value.height,
-                    );
-                  },
-                );
+                return _shrinkingListItem();
               }
               var globalKey = RectGetter.createGlobalKey();
               return RectGetter(
@@ -258,6 +252,18 @@ class _BodyWidgetState extends State<BodyWidget> with TickerProviderStateMixin {
           ),
         )
       ],
+    );
+  }
+
+  Widget _shrinkingListItem() {
+    return AnimatedBuilder(
+      animation: _transitionController,
+      builder: (context, child) {
+        return SizedBox(
+          height: (1 - _transitionController.value) *
+              _rectAnimation.value.height,
+        );
+      },
     );
   }
 
